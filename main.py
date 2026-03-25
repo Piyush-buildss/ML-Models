@@ -1,3 +1,5 @@
+# app.py
+import streamlit as st
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
@@ -15,20 +17,29 @@ y = np.array([50, 60, 65, 80, 85])
 model = LinearRegression()
 model.fit(X, y)
 
-# Take user input
-study = float(input("Enter study hours: "))
-sleep = float(input("Enter sleep hours: "))
-attendance = float(input("Enter attendance: "))
+# Streamlit UI
+st.title("📊 Marks Prediction AI")
 
-# Prediction
-marks = model.predict([[study, sleep, attendance]])[0]
+study = st.number_input("Enter study hours:", min_value=0)
+sleep = st.number_input("Enter sleep hours:", min_value=0)
+attendance = st.number_input("Enter attendance:", min_value=0)
 
-print("Predicted Marks:", marks)
+if st.button("Predict Marks"):
+    marks = model.predict([[study, sleep, attendance]])[0]
+    st.subheader(f"Predicted Marks: {marks:.2f}")
 
-# Logic layer
-if marks < 50:
-    print("Result: Fail risk. Increase study hours.")
-elif marks < 70:
-    print("Result: Average. Improve consistency.")
-else:
-    print("Result: Good performance.")
+    # Logic layer
+    if marks < 50:
+        st.warning("⚠️ High fail risk. Study more.")
+    elif marks < 70:
+        st.info("⚡ Average. Improve consistency.")
+    else:
+        st.success("🔥 Good performance!")
+
+    # Feature impact
+    weights = model.coef_
+    st.write("---")
+    st.write("📌 Feature Contributions:")
+    st.write(f"Study contribution: {weights[0]*study:.2f}")
+    st.write(f"Sleep contribution: {weights[1]*sleep:.2f}")
+    st.write(f"Attendance contribution: {weights[2]*attendance:.2f}")
